@@ -22,9 +22,25 @@ export class PetAdoptionController {
     @ApiBadRequestResponse({ description: "Bad Request", type: BadRequestResponseDto })
     @ApiInternalServerErrorResponse({ description: "Internal server error", type: InternalServerErrorResponseDto })
     @ApiUnauthorizedResponse({ description: "Unauthorized", type: UnauthorizedResponseDto })
-    @Post()
+    @Put()
     async create(@Body() createPetDto: CreatePetAdoptionDto) {
         return await this.PetAdoptionService.UpdatePetAdoptionStatus(createPetDto);
+    }
+
+
+    @ApiOperation({ summary: "Create a new Pet adoption request" })
+    @ApiBody({
+        description: "adoption data for creation.",
+        type: UpdatePetAdoptionDto
+    })
+    @ApiHeaders([signture])
+    @ApiOkResponse({ description: "Pet adoption request submitted successfully", type: CreatePetResponseDto })
+    @ApiBadRequestResponse({ description: "Bad Request", type: BadRequestResponseDto })
+    @ApiInternalServerErrorResponse({ description: "Internal server error", type: InternalServerErrorResponseDto })
+    @ApiUnauthorizedResponse({ description: "Unauthorized", type: UnauthorizedResponseDto })
+    @Put("allocate")
+    async update(@Body() updatePetDto: UpdatePetAdoptionDto) {
+        return await this.PetAdoptionService.allocatePetAdoption(updatePetDto);
     }
 
     

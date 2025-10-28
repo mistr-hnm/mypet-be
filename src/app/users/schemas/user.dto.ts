@@ -23,19 +23,21 @@ export class LoginUserResponseDto {
 
     @ApiProperty({
         example: {
-            user: 'jh3h434h3i4h34',
+            user: 1,
             email: 'jhon@example.com',
             token: '3ds34dsr54dsds98ds9d8s9d9sdsds8d9asyd989s8yfasdasd897asd98as',
             createdAt: new Date().toString(),
+            usertype : "USER",
             permission: [],
 
         },
         description: 'The response data object',
     })
     data: {
-        user: string;
+        user: number;
         email: string;
         token: string;
+        usertype: string;
         createdAt?: string;
         permission?: any[]
     };
@@ -98,7 +100,7 @@ export class CreateUserResponseDto {
             id: 123,
             name: 'John Doe',
             email: 'john.doe@example.com',
-            description: 'A new user created via the API'
+            description: 'A new user created via the API' 
         },
         description: 'The created user data object',
     })
@@ -150,13 +152,13 @@ export class UpdateUserResponseDto {
             email: 'john.doe.updated@example.com',
             description: 'User description updated',
         },
-        description: 'The updated user data object',
+        description: 'The updated user data object'
     })
     data: {
         id: number;
         name?: string;
         email?: string;
-        description?: string;
+        description?: string 
     }
 }
 
@@ -219,7 +221,7 @@ export class GetUsersResponseDto {
                 id: 123,
                 name: 'John Doe',
                 email: 'john.doe@example.com',
-                description: 'A brief description of the user',
+                description: 'A brief description of the user'
             },
             {
                 id: 456,

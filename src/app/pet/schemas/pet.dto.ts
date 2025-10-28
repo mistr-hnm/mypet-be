@@ -17,6 +17,11 @@ export enum PetGender {
     UNKNOWN = 'Unknown'
 }
 
+export enum adoptionStatus {
+    PENDING = 'PENDING',
+    COMPLETED = 'COMPLETED'
+}
+
 export enum PetSpecies {
     DOG = 'Dog',
     CAT = 'Cat',
@@ -265,6 +270,13 @@ export class GetPetDto {
     @IsString()
     @IsOptional()
     readonly picture?: string;
+    
+    @ApiProperty({ example: adoptionStatus.PENDING, description: "The gender of the Pet", enum: adoptionStatus })
+    @IsString()
+    @IsOptional()
+    @IsEnum(adoptionStatus)
+    readonly adoptionStatus?: adoptionStatus;
+    
 
 
     

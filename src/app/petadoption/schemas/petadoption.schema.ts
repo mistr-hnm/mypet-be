@@ -10,6 +10,7 @@ import { Pet } from '../../pet/schemas/pet.schema';
 
 export enum AdoptionStatus {
   PENDING = 'PENDING',
+  REQUEST = 'REQUEST',
   APPROVED = 'APPROVED',
   REJECTED = 'REJECTED',
   COMPLETED = 'COMPLETED',

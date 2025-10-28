@@ -13,12 +13,12 @@ export class CreatePetAdoptionDto {
     @ApiProperty({ example: 123, description: "The unique identifier of the user" })
     @IsNumber()
     @IsNotEmpty()
-    userId: string;
+    userId: number;
 
     @ApiProperty({ example: 123, description: "The unique identifier of the user" })
     @IsNumber()
     @IsNotEmpty()
-    petId: string;
+    petId: number;
 
     @ApiProperty({ example: AdoptionStatus.PENDING, description: "The species of the Pet", enum: AdoptionStatus })
     @IsEnum(AdoptionStatus)

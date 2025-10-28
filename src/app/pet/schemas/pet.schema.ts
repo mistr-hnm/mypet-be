@@ -17,6 +17,11 @@ export enum PetSpecies {
     OTHER = 'Other',
 }
 
+export enum adoptionStatus {
+    PENDING = 'PENDING',
+    COMPLETED = 'COMPLETED',
+}
+
 @Entity()
 export class Pet extends BaseSchema {
     
@@ -53,6 +58,9 @@ export class Pet extends BaseSchema {
 
     @Column({ type: 'boolean', default: true })
     isAvailableForAdoption: boolean;
+
+    @Column({ type: 'enum', enum: adoptionStatus, nullable: false, default : adoptionStatus.PENDING })
+    adoptionStatus: adoptionStatus;
 
     @Column({ type: 'varchar', nullable: true })
     description: string;

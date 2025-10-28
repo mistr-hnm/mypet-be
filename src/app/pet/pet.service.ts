@@ -64,7 +64,7 @@ export class PetService {
       
     // Search
     if (searchTerm) {
-      query.where( '(Pet.fullname ILIKE :term OR Pet.description ILIKE :term' + { term: `%${searchTerm}%` });
+      query.where( '(Pet.fullname ILIKE :term OR Pet.breed ILIKE :term)' , { term: `%${searchTerm}%` });
     }
 
     // Sorting
@@ -89,6 +89,10 @@ export class PetService {
         description: Pet.description,
         species: Pet.species,
         picture: picture.url,
+        ageYears: Pet.ageYears,
+        breed: Pet.breed,
+        gender: Pet.gender,
+        adoptionStatus : Pet.adoptionStatus,
         adopter: adopter ? {  
             id: Pet.adopter.id,
             fullname: Pet.adopter?.name,
@@ -98,7 +102,6 @@ export class PetService {
         createdAt: Pet.createdAt?.toDateString() ?? 'N/A',
       };
     });
-
     return PaginationUtil.paginate(true, 'Pets fetched successfully', data, total, page, limit);
   }
 
@@ -121,6 +124,9 @@ export class PetService {
         description: Pet.description,
         species: Pet.species,
         picture: Pet.picture.id,
+        ageYears: Pet.ageYears,
+        breed: Pet.breed,
+        gender: Pet.gender
       }
     };
   }

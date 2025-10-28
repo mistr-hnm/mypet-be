@@ -2,7 +2,7 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 
-import { Pet } from '../pet/schemas/pet.schema';
+import { adoptionStatus, Pet } from '../pet/schemas/pet.schema';
 import { PetAdoption, AdoptionStatus } from './schemas/petadoption.schema';
 import { User } from '../users/schemas/user.entity';
 import { CreatePetAdoptionDto, CreatePetAdoptionResponseDto, UpdatePetAdoptionDto, UpdatePetAdoptionResponseDto } from './schemas/petadoption.dto';
@@ -22,25 +22,23 @@ export class PetAdoptionService {
 
   ) { }
 
-  async UpdatePetAdoptionStatus(
-    dto: CreatePetAdoptionDto, 
-  ): Promise<CreatePetAdoptionResponseDto | UpdatePetAdoptionResponseDto> {
-    const userId = parseInt(dto.userId);
-    const petId = parseInt(dto.petId);
+  async UpdatePetAdoptionStatus(dto: CreatePetAdoptionDto): Promise<CreatePetAdoptionResponseDto> {
+    const userId = dto.userId;
+    const petId = dto.petId;
 
-    
+
     const user = await this.userRepository.findOne({ where: { id: userId } });
     if (!user) throw new NotFoundException('User not found.');
 
     const pet = await this.petRepository.findOne({ where: { id: petId } });
     if (!pet) throw new NotFoundException('Pet not found.');
 
-   
+
     let adoption = await this.petadoptionRepository.findOne({
       where: {
-        user: { id: userId },  
-        pet: { id: petId },   
-      }, 
+        user: { id: userId },
+        pet: { id: petId },
+      },
       relations: ['user', 'pet'],
     });
 
@@ -48,7 +46,7 @@ export class PetAdoptionService {
 
     // update
     if (adoption) {
-      
+
       adoption.petstatus = newStatus;
       adoption.remarks = dto.remarks || adoption.remarks;
 
@@ -82,12 +80,10 @@ export class PetAdoptionService {
 
       const savedAdoption = await this.petadoptionRepository.save(adoption);
 
-      if (newStatus === AdoptionStatus.COMPLETED) {
-        await this.petRepository.update(petId, {
-          adopter: user,
-          isAvailableForAdoption: false,
-        });
-      }
+      await this.petRepository.update(petId, {
+        adopter: user,
+        isAvailableForAdoption: false,
+      });
 
       return {
         status: true,
@@ -95,5 +91,51 @@ export class PetAdoptionService {
       };
     }
   }
+
+
+  async allocatePetAdoption(dto: UpdatePetAdoptionDto): Promise<UpdatePetAdoptionResponseDto> {
+    const petId = dto.petId;
+
+    const pet = await this.petRepository.findOne({ where: { id: petId } });
+    if (!pet) throw new NotFoundException('Pet not found.');
+
+
+    let adoption = await this.petadoptionRepository.findOne({
+      where: {
+        pet: { id: petId },
+      },
+      relations: ['user', 'pet'],
+    });
+
+    const newStatus = dto.petstatus || AdoptionStatus.PENDING;
+
+    if (!adoption) {
+      throw new NotFoundException('Adoption not found.');
+    }
+  
+    if ([AdoptionStatus.COMPLETED].includes(newStatus)) {
+      await this.petadoptionRepository.update({ id: adoption.id }, { petstatus: newStatus })
+      await this.petRepository.update({ id: petId }, {
+        adoptionStatus: adoptionStatus.COMPLETED,
+      }); 
+    } else {
+      await this.petadoptionRepository.update({ id: adoption.id }, { petstatus: newStatus })
+      await this.petRepository.update({ id: petId }, {
+        isAvailableForAdoption: true,
+      }); 
+    }
+
+    if (newStatus == AdoptionStatus.REJECTED) {
+      
+    } 
+
+    return {
+      status: true,
+      message: 'Adoption status updated successfully.',
+    };
+
+
+  }
+
 
 }

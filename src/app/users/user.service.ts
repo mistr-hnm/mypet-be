@@ -37,7 +37,7 @@ export class UserService {
   async login(loginUserDto: LoginUserDto): Promise<LoginUserResponseDto | null> {
     const user = await this.userRepo.findOne({
       where: { email: loginUserDto.email },
-      select: ['id', 'password', 'email'],
+      select: ['id', 'password', 'email' ,'usertype'],
     });
 
     if (!user) {
@@ -57,9 +57,10 @@ export class UserService {
       status: true,
       message: 'User logged in successfully.',
       data: {
-        user: user.id.toString(),
+        user: user.id,
         email: user.email,
         token,
+        usertype : user.usertype,
         permission: cachedPermissions.data,
       },
     };
