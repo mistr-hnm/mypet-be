@@ -1,0 +1,15 @@
+services:
+    mypet-be-app:
+      build:
+        context: .
+        dockerfile: Dockerfile
+
+      container_name: mypet-be-container  
+      
+      ports:
+        - "8000:3000"
+      
+      env_file:
+        - ./.env
+      
+      restart: always

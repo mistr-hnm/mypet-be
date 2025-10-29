@@ -1,0 +1,7 @@
+services:
+  mypet-be:
+    image: ghcr.io/mistr-hnm/mypet-be:latest
+    env_file:
+      - .env
+    ports:
+      - "3000:3000" 
