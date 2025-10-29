@@ -37,7 +37,7 @@ import { AuthenticationMiddleware } from 'src/core/middleware/authentication.mid
         database: config.get<string>('POSTGRES_DB'),
         autoLoadEntities: true,
         synchronize: true,
-        // ssl: { rejectUnauthorized: false },
+        ssl: { rejectUnauthorized: false },
         logging: true,
       }),
     }),

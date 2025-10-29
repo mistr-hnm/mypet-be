@@ -21,6 +21,7 @@ export class AuthenticationMiddleware implements NestMiddleware {
         const allowedURLS = [
             "/api/users/login",
             "/api/users/signup",
+            "/api/permissions",
         ];
         if (allowedURLS.includes(originalUrl)) {
             next()
