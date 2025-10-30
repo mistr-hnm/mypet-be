@@ -50,8 +50,11 @@ jobs:
       - name: Copy env files to server
         run: |
           scp docker-compose.prod.yaml ubuntu@65.0.99.198:/home/ubuntu/
-          ssh ubuntu@65.0.99.198 "cat > /home/ubuntu/apps/mypet-be/.env" << 'EOF'
-          ${{ secrets.BE_APP_ENV_FILE }}
+          ssh ubuntu@65.0.99.198  <<EOF
+            mkdir -p /home/ubuntu/apps/mypet-be/" 
+            cat > /home/ubuntu/apps/mypet-be/.env" << 'ENV_EOF' 
+            ${{ secrets.BE_APP_ENV_FILE }}
+            EOF_EOF
           EOF
       
       - name: Log in to Container Registry on server and deploy
