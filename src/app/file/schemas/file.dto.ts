@@ -2,7 +2,7 @@ import { ApiProperty } from '@nestjs/swagger';
 import { IsString, IsNotEmpty, IsNumber, IsPositive, Min } from 'class-validator';
 
  export class FileDto {
-    @ApiProperty({ example: 'dsd5sds8dsds87d45sd9874wewed', description: "The ID of the course" })
+    @ApiProperty({ example: 'dsd5sds8dsds87d45sd9874wewed', description: "The ID of the file" })
     @IsNumber()
     @IsNotEmpty()
     @IsPositive()
@@ -26,7 +26,7 @@ import { IsString, IsNotEmpty, IsNumber, IsPositive, Min } from 'class-validator
 }
  
 export class CreateFileResponseDto {
-    @ApiProperty({ example: true, description: 'Indicates if the course creation was successful' })
+    @ApiProperty({ example: true, description: 'Indicates if the file creation was successful' })
     status: boolean;
 
     @ApiProperty({
@@ -64,7 +64,7 @@ export class GetFileResponseDto {
             filename: 'Image.jpg',
             url: 'https://aws.bucketname.com/filename.jpg', 
         },
-        description: 'The course data object (optional, present if success is true)',
+        description: 'The file data object (optional, present if success is true)',
     })
     data?: {
         id: number;

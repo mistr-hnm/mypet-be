@@ -181,7 +181,7 @@ export class GetPermissionsResponseDto {
         example: [
             {
                 id: 123,
-                module: 'courses',
+                module: 'files',
                 permission: ['r', 'w', 'd'],
                 description: 'Allows managing user accounts.', 
             },
