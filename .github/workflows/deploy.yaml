@@ -62,7 +62,7 @@ jobs:
           ssh ubuntu@65.0.99.198 <<EOF
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             docker pull ghcr.io/mistr-hnm/mypet-be:latest
-            docker compose -f /home/ubuntu/apps/mypet-be/docker-compose.prod.yaml up -d --remove-orphans
+            docker compose -f /home/ubuntu/docker-compose.prod.yaml up -d --remove-orphans
           EOF
 
 
