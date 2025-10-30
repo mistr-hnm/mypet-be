@@ -23,7 +23,7 @@ jobs:
         with: 
           context: .
           file: ./Dockerfile
-          target: prod-be
+          target: prod
           push: true
           tags: | 
             ghcr.io/mistr-hnm/mypet-be:latest
