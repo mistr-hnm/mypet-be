@@ -45,12 +45,12 @@ jobs:
           ssh-private-key: ${{ secrets.DEPLOY_SSH_PRIVATE_KEY }}
       
       - name: Add SSH host key
-        run: ssh-keyscan -H 65.0.99.198 >> ~/.ssh/known_hosts
+        run: ssh-keyscan -H 13.233.160.226 >> ~/.ssh/known_hosts
 
       - name: Copy env files to server
         run: |
-          scp docker-compose.prod.yaml ubuntu@65.0.99.198:/home/ubuntu/
-          ssh ubuntu@65.0.99.198  <<EOF
+          scp docker-compose.prod.yaml ubuntu@13.233.160.226:/home/ubuntu/
+          ssh ubuntu@13.233.160.226  <<EOF
             mkdir -p /home/ubuntu/apps/mypet-be/ 
             cat > /home/ubuntu/apps/mypet-be/.env << 'ENV_EOF' 
             ${{ secrets.BE_APP_ENV_FILE }}
@@ -59,7 +59,7 @@ jobs:
       
       - name: Log in to Container Registry on server and deploy
         run: |
-          ssh ubuntu@65.0.99.198 <<EOF
+          ssh ubuntu@13.233.160.226 <<EOF
             echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u "${{ github.actor }}" --password-stdin
             docker pull ghcr.io/mistr-hnm/mypet-be:latest
             docker compose -f /home/ubuntu/docker-compose.prod.yaml up -d --remove-orphans
