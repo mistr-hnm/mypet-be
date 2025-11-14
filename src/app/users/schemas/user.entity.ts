@@ -15,7 +15,7 @@ export class User extends BaseSchema {
     @Column({ type: 'varchar', nullable: false })
     email: string;
 
-    @Column({ type: 'varchar', nullable: false })
+    @Column({ type: 'varchar', nullable: true })
     password: string;
 
     @Column({ type: 'varchar', nullable: true })

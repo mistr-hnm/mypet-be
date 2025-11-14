@@ -59,6 +59,11 @@ export class UserDto {
     @IsOptional()
     readonly email?: string;
 
+    @ApiProperty({ example: "john.d@example.com", description: "The email of the user" })
+    @IsEmail()
+    @IsOptional()
+    readonly usertype?: string;
+
     @ApiProperty({ example: "Description about the user", description: "Additional description about the user" })
     @IsString()
     @IsOptional()
@@ -78,8 +83,8 @@ export class CreateUserDto {
 
     @ApiProperty({ example: "Pass#123", description: "The password of the user" })
     @IsString()
-    @IsNotEmpty()
-    readonly password: string;
+    @IsOptional()
+    readonly password?: string;
 
     @ApiProperty({ example: "A brief description about the user", description: "Additional description about the user", required: false })
     @IsString()

@@ -1,15 +1,18 @@
-import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, Param, Post, Put, Query, Req, Res, UseGuards, } from '@nestjs/common';
 import { ApiBody, ApiHeaders, ApiOperation, ApiParam, ApiBadRequestResponse, ApiUnauthorizedResponse, ApiOkResponse, ApiNotFoundResponse, ApiInternalServerErrorResponse } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { signture } from '../../core/meta/global.header';
 import { CreateUserDto, CreateUserResponseDto, DeleteUserResponseDto, GetUserResponseDto, GetUsersResponseDto, LoginUserDto, LoginUserResponseDto, UpdateUserDto, UpdateUserResponseDto } from './schemas/user.dto';
 import { BadRequestResponseDto, InternalServerErrorResponseDto, NotFoundResponseDto, UnauthorizedResponseDto } from '../../lib/global.response';
 import { PaginationDto } from '../../lib/paginatation.util';
+import { AuthGuard } from '@nestjs/passport';
+import { ConfigService } from '@nestjs/config';
 
 @Controller()
 export class UserController {
     constructor(
-        private readonly userService: UserService
+        private readonly userService: UserService,
+        private readonly configService: ConfigService,
     ) { }
 
     @ApiOperation({ summary: "User login" })
@@ -21,8 +24,8 @@ export class UserController {
     @ApiBadRequestResponse({ description: "Bad request", type: BadRequestResponseDto })
     @ApiUnauthorizedResponse({ description: "Unautherized", type: UnauthorizedResponseDto })
     @ApiOkResponse({ description: "Logged in successfully", type: LoginUserResponseDto })
-    @ApiNotFoundResponse({ description: "Email not found" , type : NotFoundResponseDto })
-    @ApiInternalServerErrorResponse({ description: "Internal server error" , type : InternalServerErrorResponseDto })
+    @ApiNotFoundResponse({ description: "Email not found", type: NotFoundResponseDto })
+    @ApiInternalServerErrorResponse({ description: "Internal server error", type: InternalServerErrorResponseDto })
     @HttpCode(200)
     @Post("/login")
     async login(@Body() loginUserDto: LoginUserDto) {
@@ -38,7 +41,7 @@ export class UserController {
     @ApiBadRequestResponse({ description: "Bad request", type: BadRequestResponseDto })
     @ApiUnauthorizedResponse({ description: "Unautherized", type: UnauthorizedResponseDto })
     @ApiOkResponse({ description: "User created successfully", type: CreateUserResponseDto })
-    @ApiInternalServerErrorResponse({ description: "Internal server error" , type : InternalServerErrorResponseDto })
+    @ApiInternalServerErrorResponse({ description: "Internal server error", type: InternalServerErrorResponseDto })
     @Post("signup")
     async create(@Body() createUserDto: CreateUserDto) {
         return await this.userService.create(createUserDto)
@@ -46,13 +49,12 @@ export class UserController {
 
     @ApiOperation({ summary: "Get all users" })
     @ApiHeaders([signture])
-    @ApiUnauthorizedResponse({ description: "Unautherized", type: UnauthorizedResponseDto  })
+    @ApiUnauthorizedResponse({ description: "Unautherized", type: UnauthorizedResponseDto })
     @ApiOkResponse({ description: "User fetched successfully", type: GetUsersResponseDto })
-    @ApiNotFoundResponse({ description: "Users not found" , type : NotFoundResponseDto })
-    @ApiInternalServerErrorResponse({ description: "Internal server error" , type : InternalServerErrorResponseDto })
+    @ApiNotFoundResponse({ description: "Users not found", type: NotFoundResponseDto })
+    @ApiInternalServerErrorResponse({ description: "Internal server error", type: InternalServerErrorResponseDto })
     @Get()
-    findAll(@Query() paginationDto : PaginationDto) {
-        console.log("paginationDto",paginationDto);
+    findAll(@Query() paginationDto: PaginationDto) {
         return this.userService.findAll(paginationDto)
     }
 
@@ -61,8 +63,8 @@ export class UserController {
     @ApiHeaders([signture])
     @ApiUnauthorizedResponse({ description: "Unautherized", type: UnauthorizedResponseDto })
     @ApiOkResponse({ description: "User fetched successfully", type: GetUserResponseDto })
-    @ApiNotFoundResponse({ description: "User not found" , type : NotFoundResponseDto })
-    @ApiInternalServerErrorResponse({ description: "Internal server error" , type : InternalServerErrorResponseDto })
+    @ApiNotFoundResponse({ description: "User not found", type: NotFoundResponseDto })
+    @ApiInternalServerErrorResponse({ description: "Internal server error", type: InternalServerErrorResponseDto })
     @Get(':id')
     findById(@Param('id') id: string) {
         return this.userService.findById(id)
@@ -78,8 +80,8 @@ export class UserController {
     @ApiBadRequestResponse({ description: "Bad request", type: BadRequestResponseDto })
     @ApiUnauthorizedResponse({ description: "Unautherized", type: UnauthorizedResponseDto })
     @ApiOkResponse({ description: "User updated successfully", type: UpdateUserResponseDto })
-    @ApiNotFoundResponse({ description: "Users not found" , type : NotFoundResponseDto })
-    @ApiInternalServerErrorResponse({ description: "Internal server error" , type : InternalServerErrorResponseDto })
+    @ApiNotFoundResponse({ description: "Users not found", type: NotFoundResponseDto })
+    @ApiInternalServerErrorResponse({ description: "Internal server error", type: InternalServerErrorResponseDto })
     @Put(':id')
     update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
         return this.userService.update(id, updateUserDto)
@@ -91,11 +93,25 @@ export class UserController {
     @ApiBadRequestResponse({ description: "Bad request", type: BadRequestResponseDto })
     @ApiUnauthorizedResponse({ description: "Unautherized", type: UnauthorizedResponseDto })
     @ApiOkResponse({ description: "User deleted successfully", type: DeleteUserResponseDto })
-    @ApiNotFoundResponse({ description: "Users not found" , type : NotFoundResponseDto })
-    @ApiInternalServerErrorResponse({ description: "Internal server error" , type : InternalServerErrorResponseDto })
+    @ApiNotFoundResponse({ description: "Users not found", type: NotFoundResponseDto })
+    @ApiInternalServerErrorResponse({ description: "Internal server error", type: InternalServerErrorResponseDto })
     @Delete(':id')
     delete(@Param('id') id: string) {
         return this.userService.delete(id)
     }
+
+
+    @UseGuards(AuthGuard('google'))
+    @Get('google/login')
+    googleLogin() { }
+
+    @UseGuards(AuthGuard('google'))
+    @Get('google/callback')
+    async googleCallback(@Req() req, @Res() res) {
+        const response = await this.userService.googleLogin(req.user);
+        const encoded = encodeURIComponent(JSON.stringify(response.data));
+        res.redirect(`${this.configService.get<string>('FE_URI')}/oauth?data=${encoded}`);
+    }
+
 }
 

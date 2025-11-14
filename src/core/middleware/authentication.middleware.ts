@@ -13,21 +13,25 @@ export class AuthenticationMiddleware implements NestMiddleware {
 
 
     async use(req: Request, res: Response, next: NextFunction) {
-        if (!req.headers['mypet-signature'] || req.headers['mypet-signature'] != process.env.API_KEY) {
-            throw new UnauthorizedException("Signature invalid")
-        }
         const { ip, method, originalUrl } = req
 
         const allowedURLS = [
             "/api/users/login",
             "/api/users/signup",
+            "/api/users/google/login",
+            "/api/users/google/callback",
             "/api/permissions",
         ];
-        if (allowedURLS.includes(originalUrl)) {
-            next()
-        } else {
-            const authHeader = req.headers['authorization']
 
+        const cleanUrl = originalUrl.split('?')[0]; // Remove query parameters from the URL
+
+        if (allowedURLS.includes(cleanUrl)) {
+            next();
+        } else {
+            if (!req.headers['mypet-signature'] || req.headers['mypet-signature'] != process.env.API_KEY) {
+                throw new UnauthorizedException("Signature invalid")
+            }
+            const authHeader = req.headers['authorization']
             if (!authHeader || !authHeader.toLowerCase().startsWith('bearer ')) {
                 throw new UnauthorizedException()
             }

@@ -13,7 +13,7 @@ import { PermissionModule } from './permission/permission.module';
 import { FileModule } from './file/file.module'; 
 import { PetModule } from './pet/pet.module';
 import { PetAdoptionModule } from './petadoption/petadoption.module';
-import { AuthenticationMiddleware } from 'src/core/middleware/authentication.middleware';
+import { AuthenticationMiddleware } from '../core/middleware/authentication.middleware';
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import { AuthenticationMiddleware } from 'src/core/middleware/authentication.mid
       envFilePath: '.env',
       validate: validateEnv, 
     }),
-
+    
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -37,11 +37,10 @@ import { AuthenticationMiddleware } from 'src/core/middleware/authentication.mid
         database: config.get<string>('POSTGRES_DB'),
         autoLoadEntities: true,
         synchronize: true,
-        ssl: { rejectUnauthorized: false },
+        // ssl: { rejectUnauthorized: false },
         logging: true,
       }),
     }),
-
     JwtModule.registerAsync({
       global: true,
       imports: [ConfigModule],

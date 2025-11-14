@@ -8,7 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as bcrypt from 'bcryptjs';
 import { JwtService } from '@nestjs/jwt';
-import { PermissionService } from '../permission/permission.service'; 
+import { PermissionService } from '../permission/permission.service';
 import {
   CreateUserDto,
   CreateUserResponseDto,
@@ -19,8 +19,12 @@ import {
   LoginUserResponseDto,
   UpdateUserDto,
   UpdateUserResponseDto,
+  UserDto,
 } from './schemas/user.dto';
-import { PaginationDto, PaginationUtil } from '../../lib/paginatation.util';
+import { 
+  PaginationDto, 
+  PaginationUtil
+} from '../../lib/paginatation.util';
 import { User } from './schemas/user.entity';
 
 
@@ -30,14 +34,14 @@ export class UserService {
     @InjectRepository(User)
     private readonly userRepo: Repository<User>,
 
-    private readonly permissionService: PermissionService, 
+    private readonly permissionService: PermissionService,
     private readonly jwtService: JwtService,
-  ) {}
-  
+  ) { }
+
   async login(loginUserDto: LoginUserDto): Promise<LoginUserResponseDto | null> {
     const user = await this.userRepo.findOne({
       where: { email: loginUserDto.email },
-      select: ['id', 'password', 'email' ,'usertype'],
+      select: ['id', 'password', 'email', 'usertype'],
     });
 
     if (!user) {
@@ -52,7 +56,7 @@ export class UserService {
     const payload = { sub: user.id, email: user.email };
     const token = await this.jwtService.signAsync(payload);
 
-    let cachedPermissions : any = await this.permissionService.findAll();
+    let cachedPermissions: any = await this.permissionService.findAll();
     return {
       status: true,
       message: 'User logged in successfully.',
@@ -60,18 +64,22 @@ export class UserService {
         user: user.id,
         email: user.email,
         token,
-        usertype : user.usertype,
+        usertype: user.usertype,
         permission: cachedPermissions.data,
       },
     };
   }
- 
+
   async create(createUserDto: CreateUserDto): Promise<CreateUserResponseDto> {
     const existing = await this.userRepo.findOne({
       where: { email: createUserDto.email },
     });
     if (existing) {
       throw new ConflictException('Email already exists.');
+    }
+
+    if (!createUserDto.password) {
+      throw new BadRequestException('Password is required.');
     }
 
     const hash = await bcrypt.hash(createUserDto.password, 10);
@@ -93,7 +101,7 @@ export class UserService {
       },
     };
   }
-   
+
   async findAll(paginationDto: PaginationDto): Promise<GetUsersResponseDto> {
     const { page, limit } = paginationDto;
     const skip = PaginationUtil.getSkip(page, limit);
@@ -120,9 +128,9 @@ export class UserService {
       limit,
     );
   }
- 
+
   async findById(id: string): Promise<GetUserResponseDto> {
-    const user = await this.userRepo.findOne({where : { id : parseInt(id) }});
+    const user = await this.userRepo.findOne({ where: { id: parseInt(id) } });
     if (!user) {
       throw new NotFoundException(`User with ID "${id}" not found.`);
     }
@@ -138,8 +146,8 @@ export class UserService {
       },
     };
   }
- 
-  async update(id: string , updateUserDto: UpdateUserDto): Promise<UpdateUserResponseDto> {
+
+  async update(id: string, updateUserDto: UpdateUserDto): Promise<UpdateUserResponseDto> {
     const existing = await this.userRepo.findOne({ where: { id: parseInt(id) } });
     if (!existing) {
       throw new NotFoundException(`User with ID "${id}" not found.`);
@@ -159,7 +167,7 @@ export class UserService {
         description: updatedUser?.description,
       },
     };
-  } 
+  }
 
   async delete(id: string): Promise<DeleteUserResponseDto> {
     const result = await this.userRepo.delete(id);
@@ -169,5 +177,48 @@ export class UserService {
 
     return { status: true, message: 'User deleted successfully.' };
   }
+
+
+  async validateGoogle(googleUser: CreateUserDto) {
+    const user = await this.userRepo.findOne({
+      where: { email: googleUser.email },
+      select: ['id', 'password', 'email', 'usertype'],
+    });
+
+    if (user) {
+      return {
+        status: true,
+        message: 'User fetched successfully.',
+        data: {
+          id: user.id,
+          name: user.name,
+          email: user.email,
+          description: user.description,
+        },
+      };
+    }
+    return await this.create(googleUser);
+  }
   
+
+
+  async googleLogin(googleUser: UserDto) {
+    const payload = { sub: googleUser.id, email: googleUser.email };
+    const token = await this.jwtService.signAsync(payload);
+
+    let cachedPermissions: any = await this.permissionService.findAll();
+    return {
+      status: true,
+      message: 'User logged in successfully.',
+      data: {
+        user: googleUser.id,
+        email: googleUser.email,
+        token,
+        usertype: googleUser.usertype,
+        permission: cachedPermissions.data,
+      },
+    };
+  }
+
+
 }

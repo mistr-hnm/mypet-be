@@ -15,6 +15,10 @@ const envSchema = z.object({
   S3_REGION: z.string(),
   S3_ACCESS_KEY: z.string(),
   S3_SECRET_ACCESS_KEY: z.string(),
+  CLIENT_ID: z.string(),
+  CLIENT_SECRET: z.string(),
+  REDIRECT_URI: z.string(),
+  FE_URI: z.string(),
 });
 
 export type EnvSchema = z.infer<typeof envSchema>;
